@@ -29,4 +29,45 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Mobile Menu (Simple toggle for now)
     // Add more complex mobile menu logic if requested
+
+    // Form Submission Handler
+    const form = document.getElementById('contactForm');
+    const result = document.getElementById('result');
+
+    form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const formData = new FormData(form);
+        const button = form.querySelector('button[type="submit"]');
+        const buttonText = button.textContent;
+
+        // Показываем индикатор загрузки
+        button.textContent = 'Отправка...';
+        button.disabled = true;
+
+        try {
+            const response = await fetch('https://api.web3forms.com/submit', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                result.style.display = 'block';
+                result.style.color = '#10b981';
+                result.textContent = '✅ Спасибо! Ваша заявка отправлена. Мы свяжемся с вами в ближайшее время.';
+                form.reset();
+            } else {
+                throw new Error('Ошибка отправки');
+            }
+        } catch (error) {
+            result.style.display = 'block';
+            result.style.color = '#ef4444';
+            result.textContent = '❌ Произошла ошибка. Попробуйте ещё раз или свяжитесь с нами напрямую.';
+        } finally {
+            button.textContent = buttonText;
+            button.disabled = false;
+        }
+    });
 });
